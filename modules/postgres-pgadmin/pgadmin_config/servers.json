@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "DWH Database",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "{{ env.POSTGRES_USER | default('dwh_admin') }}",
+      "Host": "dwh_db",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}
