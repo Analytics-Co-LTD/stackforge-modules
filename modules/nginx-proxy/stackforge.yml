@@ -1,0 +1,23 @@
+name: nginx-proxy
+version: v1.2.0
+description: Nginx reverse proxy + SSL with automatic certificate management
+environment: dev
+docker_compose_path: docker-compose.yml
+env_template_path: .env.template
+dependencies: []
+tags:
+  - proxy
+  - ssl
+  - nginx
+  - reverse-proxy
+ports:
+  - 80:80
+  - 443:443
+volumes:
+  - nginx_certs
+  - nginx_html
+  - nginx_dhparam
+maintainer: Analytics Co., LTD
+license: MIT
+repository: https://github.com/Analytics-Co-LTD/stackforge-modules
+documentation: https://github.com/Analytics-Co-LTD/stackforge-modules/tree/main/modules/nginx-proxy
