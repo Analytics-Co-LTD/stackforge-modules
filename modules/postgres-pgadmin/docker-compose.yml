@@ -1,0 +1,56 @@
+version: "3.8"
+
+networks:
+  stackanalytics_net:
+    external: true
+
+services:
+  dwh_db:
+    image: postgres:15
+    container_name: ${INSTANCE_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DWH_DB_PORT}:5432"
+    volumes:
+      - dwh_db_data:/var/lib/postgresql/data
+      - ./dwh_init:/docker-entrypoint-initdb.d
+    networks:
+      - stackanalytics_net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${DWH_DB_MEMORY_LIMIT}
+        reservations:
+          memory: ${DWH_DB_MEMORY_RESERVATION}
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ${INSTANCE_NAME}-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin_config/servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin_config/pgpass:/var/lib/pgadmin/.pgpass:ro
+    depends_on:
+      - dwh_db
+    networks:
+      - stackanalytics_net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${PGADMIN_MEMORY_LIMIT}
+        reservations:
+          memory: ${PGADMIN_MEMORY_RESERVATION}
+
+volumes:
+  dwh_db_data:
+  pgadmin_data:
