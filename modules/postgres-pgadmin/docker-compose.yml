@@ -1,4 +1,5 @@
-version: "3.8"
+# This compose file is rendered by StackForge using Jinja context.
+# Instance variables come from the .env rendered earlier.
 
 networks:
   stackanalytics_net:
