@@ -1,0 +1,3 @@
+# hostname:port:database:username:password
+# NOTE: This file is mounted read-only into pgAdmin. Update with care.
+*:*:*:{{ env.POSTGRES_USER | default('dwh_admin') }}:{{ env.POSTGRES_PASSWORD | default('') }}
