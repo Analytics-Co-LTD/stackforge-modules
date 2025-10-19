@@ -1,0 +1,16 @@
+name: postgres-pgadmin
+version: v1.0.0
+description: PostgreSQL database with pgAdmin UI
+environment: dev
+docker_compose_path: docker-compose.yml
+env_template_path: .env.template
+dependencies: []
+tags:
+  - database
+  - postgresql
+  - pgadmin
+  - persistence
+maintainer: Analytics Co., LTD
+license: MIT
+repository: https://github.com/Analytics-Co-LTD/stackforge-modules
+documentation: https://github.com/Analytics-Co-LTD/stackforge-modules/tree/main/modules/postgres-pgadmin
