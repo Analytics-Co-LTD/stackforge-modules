@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgresql
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-stackforge}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+      - postgres_backups:/backups
+      - ./init:/docker-entrypoint-initdb.d
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - postgres
+
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: postgresql-backup
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-stackforge}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+    volumes:
+      - postgres_backups:/backups
+      - ./scripts/backup.sh:/usr/local/bin/backup.sh:ro
+    command: >
+      sh -c 'apk add --no-cache dcron &&
+             echo "$${BACKUP_SCHEDULE} /usr/local/bin/backup.sh" | crontab - &&
+             crond -f'
+    restart: unless-stopped
+    networks:
+      - postgres
+
+volumes:
+  postgres_data:
+  postgres_backups:
+
+networks:
+  postgres:
+    driver: bridge
